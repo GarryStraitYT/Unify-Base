@@ -1,14 +1,18 @@
-import inspect
-import sys
-import time
-
-import discord
+import inspect, sys, time, discord, requests, os
 
 from bot import ModerationBot
 from commands.base import Command
 from helpers.embed_builder import EmbedBuilder
 from helpers.misc_functions import (author_is_mod, is_integer,
                                     is_valid_duration, parse_duration)
+
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+try:
+    TOKEN = open(os.path.join(__location__, "token.txt"), "r").read().strip("\n")
+except FileNotFoundError:
+    quit("Please create a token.txt file and place your token in it!")
+if TOKEN is None:
+    quit("Please create a token.txt file and place your token in it!")
 
 class SpyPetBanCommand(Command):
     def __init__(self, client_instance: ModerationBot) -> None:
@@ -34,9 +38,9 @@ class SpyPetBanCommand(Command):
         response = requests.post(f"https://discord.com/api/v10/guilds/{GUILD_ID}/bulk-ban", headers=headers, json=data)
 
         if response.status_code == 200:
-            await ctx.send("Banned selfbots successfully.")
+            await ctx.author.send("Banned selfbots successfully.")
         else:
-            await ctx.send(f"Failed to ban selfbots. Status code: {response.status_code}")
+            await ctx.author.send(f"Failed to ban selfbots. Status code: {response.status_code}")
 
 
 class HardBanCommand(Command):
